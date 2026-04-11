@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { EventsModule } from './events/events.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -35,6 +36,7 @@ import configuration from './config/configuration';
     AuthModule,
     CampaignsModule,
     EventsModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
