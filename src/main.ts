@@ -22,7 +22,9 @@ async function bootstrap() {
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('Multi-Tenant Tracking API')
-    .setDescription('Backend for website event tracking with multi-tenant isolation')
+    .setDescription(
+      'Backend for website event tracking with multi-tenant isolation',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
