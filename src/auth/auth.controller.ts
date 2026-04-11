@@ -1,9 +1,13 @@
 import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { RefreshTokenGuard } from '../common/guards/refresh-token.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -35,8 +39,10 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
-  async refresh(@Body() dto: RefreshTokenDto): Promise<AuthResponseDto> {
-    return this.authService.refresh(dto.refreshToken);
+  async refresh(@Req() req: Request): Promise<AuthResponseDto> {
+    const authHeader = req.headers.authorization;
+    const refreshToken = authHeader?.slice(7) || '';
+    return this.authService.refresh(refreshToken);
   }
 
   @Post('logout')

@@ -23,7 +23,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const passwordMatch = await bcrypt.compare(loginDto.password, user.passwordHash);
+    const passwordMatch = await bcrypt.compare(
+      loginDto.password,
+      user.passwordHash,
+    );
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -41,31 +44,40 @@ export class AuthService {
         throw new UnauthorizedException('Invalid token type');
       }
 
-      // Check if token exists in DB and is not revoked
-      const storedToken = await this.prisma.refreshToken.findUnique({
-        where: { token: refreshToken },
+      // Find tokens for this user
+      const storedTokens = await this.prisma.refreshToken.findMany({
+        where: { userId: payload.sub },
         include: { user: true },
       });
 
-      if (!storedToken || storedToken.revokedAt) {
+      // Check if the provided token matches any stored (hashed) token and is not revoked
+      let matchedToken = null;
+      for (const token of storedTokens) {
+        if (await bcrypt.compare(refreshToken, token.token)) {
+          matchedToken = token;
+          break;
+        }
+      }
+
+      if (!matchedToken || matchedToken.revokedAt) {
         throw new UnauthorizedException('Token has been revoked');
       }
 
-      if (new Date() > storedToken.expiresAt) {
+      if (new Date() > matchedToken.expiresAt) {
         throw new UnauthorizedException('Token has expired');
       }
 
       // Revoke old token
       await this.prisma.refreshToken.update({
-        where: { id: storedToken.id },
+        where: { id: matchedToken.id },
         data: { revokedAt: new Date() },
       });
 
       // Generate new tokens
       return this.generateTokens(
-        storedToken.user.id,
-        storedToken.user.tenantId,
-        storedToken.user.role,
+        matchedToken.user.id,
+        matchedToken.user.tenantId,
+        matchedToken.user.role,
       );
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired refresh token');
@@ -93,7 +105,9 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('jwt.secret'),
-        expiresIn: this.configService.get<string>('jwt.accessTokenExpiration') as any,
+        expiresIn: this.configService.get<string>(
+          'jwt.accessTokenExpiration',
+        ) as any,
       },
     );
 
@@ -109,7 +123,9 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('jwt.refreshSecret'),
-        expiresIn: this.configService.get<string>('jwt.refreshTokenExpiration') as any,
+        expiresIn: this.configService.get<string>(
+          'jwt.refreshTokenExpiration',
+        ) as any,
       },
     );
 
