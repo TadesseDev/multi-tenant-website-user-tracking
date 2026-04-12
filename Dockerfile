@@ -1,5 +1,5 @@
 # Builder stage
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 
 WORKDIR /app
 
@@ -9,16 +9,20 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# # Runtime stage
-# FROM node:20-alpine
+# Runtime stage
+FROM node:20
 
-# WORKDIR /app
+WORKDIR /app
 
-# COPY package*.json ./
-# RUN npm ci --only=production
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-# COPY --from=builder /app/dist ./dist
+# Copy Prisma schema and migrations (needed for prisma migrate deploy)
+COPY prisma ./prisma
+
+# Copy built application
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]

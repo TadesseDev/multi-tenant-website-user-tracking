@@ -17,12 +17,16 @@ import configuration from './config/configuration';
       isGlobal: true,
       load: [configuration],
     }),
-    JwtModule.register({
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
       global: true,
-      secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
-      signOptions: {
-        expiresIn: process.env.JWT_EXPIRATION || '15m' as any,
-      },
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('jwt.secret'),
+        signOptions: {
+          expiresIn: configService.get<number>('jwt.accessTokenExpiration'),
+        },
+      }),
     }),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

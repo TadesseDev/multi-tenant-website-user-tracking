@@ -38,8 +38,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/tracking_db
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: your-secret-key-change-in-production
-      JWT_REFRESH_SECRET: your-refresh-secret-key-change-in-production
+      JWT_SECRET: default-secret
+      JWT_REFRESH_SECRET: default-refresh-secret
       NODE_ENV: development
     depends_on:
       postgres:
@@ -48,7 +48,7 @@ services:
         condition: service_healthy
     volumes:
       - /app/node_modules
-    command: npm run start:dev
+    command: node dist/src/main
 
 volumes:
   postgres_data:

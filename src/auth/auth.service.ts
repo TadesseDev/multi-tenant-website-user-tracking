@@ -34,6 +34,8 @@ export class AuthService {
     return this.generateTokens(user.id, user.tenantId, user.role);
   }
 
+  // TODO: cleanup the linter issues.
+
   async refresh(refreshToken: string): Promise<AuthResponseDto> {
     try {
       const payload = this.jwtService.verify(refreshToken, {

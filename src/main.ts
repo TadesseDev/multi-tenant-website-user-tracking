@@ -23,7 +23,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Multi-Tenant Tracking API')
     .setDescription(
-      'Backend for website event tracking with multi-tenant isolation',
+      'Backend for website event tracking with multi-tenant isolation by Tadesse D',
     )
     .setVersion('1.0')
     .addBearerAuth()
@@ -34,7 +34,14 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`🚀 Application is running on: http://localhost:${port}/api`);
 }
 
-bootstrap();
+bootstrap()
+  .then(() => {
+    console.log(
+      `🚀 API is running on: http://localhost:${process.env.PORT ?? 3000}`,
+    );
+  })
+  .catch((err) => {
+    console.error(err);
+  });
