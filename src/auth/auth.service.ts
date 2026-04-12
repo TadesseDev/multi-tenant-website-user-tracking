@@ -38,9 +38,12 @@ export class AuthService {
 
   async refresh(refreshToken: string): Promise<AuthResponseDto> {
     try {
-      const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('jwt.refreshSecret'),
-      });
+      const payload: { sub: string; type: string } = this.jwtService.verify(
+        refreshToken,
+        {
+          secret: this.configService.get<string>('jwt.refreshSecret'),
+        },
+      );
 
       if (payload.type !== 'refresh') {
         throw new UnauthorizedException('Invalid token type');
@@ -81,8 +84,11 @@ export class AuthService {
         matchedToken.user.tenantId,
         matchedToken.user.role,
       );
-    } catch (error) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+    } catch (error: unknown) {
+      throw new UnauthorizedException(
+        'Invalid or expired refresh token',
+        error instanceof Error ? error.message : undefined,
+      );
     }
   }
 
@@ -107,9 +113,7 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('jwt.secret'),
-        expiresIn: this.configService.get<string>(
-          'jwt.accessTokenExpiration',
-        ) as any,
+        expiresIn: this.configService.get<number>('jwt.accessTokenExpiration'),
       },
     );
 
@@ -125,9 +129,7 @@ export class AuthService {
       },
       {
         secret: this.configService.get<string>('jwt.refreshSecret'),
-        expiresIn: this.configService.get<string>(
-          'jwt.refreshTokenExpiration',
-        ) as any,
+        expiresIn: this.configService.get<number>('jwt.refreshTokenExpiration'),
       },
     );
 

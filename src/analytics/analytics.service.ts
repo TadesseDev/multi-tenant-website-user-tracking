@@ -19,7 +19,9 @@ export class AnalyticsService {
     });
 
     if (!campaign || campaign.tenantId !== tenantId) {
-      throw new TenantAccessException('Cannot access analytics for this campaign');
+      throw new TenantAccessException(
+        'Cannot access analytics for this campaign',
+      );
     }
 
     // Query aggregated event data grouped by date and event type

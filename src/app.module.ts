@@ -18,7 +18,6 @@ import configuration from './config/configuration';
       load: [configuration],
     }),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       global: true,
       useFactory: (configService: ConfigService) => ({

@@ -58,7 +58,7 @@ model Campaign {
 
 model Event {
   id          String   @id @default(uuid())
-  eventId     String   // External idempotency key (client-provided)
+  eventId     String // External idempotency key (client-provided)
   tenantId    String
   campaignId  String
   eventType   String

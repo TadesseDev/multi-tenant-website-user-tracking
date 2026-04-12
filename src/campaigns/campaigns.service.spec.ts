@@ -81,9 +81,9 @@ describe('CampaignsService', () => {
     it('should throw TenantAccessException when campaign not found', async () => {
       mockPrismaService.campaign.findUnique.mockResolvedValueOnce(null);
 
-      await expect(service.findOne('nonexistent', 'tenant-123')).rejects.toThrow(
-        TenantAccessException,
-      );
+      await expect(
+        service.findOne('nonexistent', 'tenant-123'),
+      ).rejects.toThrow(TenantAccessException);
     });
 
     it('should throw TenantAccessException on tenant mismatch', async () => {
@@ -92,9 +92,9 @@ describe('CampaignsService', () => {
         tenantId: 'different-tenant',
       });
 
-      await expect(service.findOne('campaign-123', 'tenant-123')).rejects.toThrow(
-        TenantAccessException,
-      );
+      await expect(
+        service.findOne('campaign-123', 'tenant-123'),
+      ).rejects.toThrow(TenantAccessException);
     });
   });
 });

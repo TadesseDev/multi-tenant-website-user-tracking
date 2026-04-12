@@ -11,7 +11,9 @@ export class EventsService {
     @InjectQueue('event-ingestion') private eventQueue: Queue,
   ) {}
 
-  async ingestEvent(ingestEventDto: IngestEventDto): Promise<{ jobId: string }> {
+  async ingestEvent(
+    ingestEventDto: IngestEventDto,
+  ): Promise<{ jobId: string }> {
     // Validate tenant and campaign exist
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: ingestEventDto.tenant_id },

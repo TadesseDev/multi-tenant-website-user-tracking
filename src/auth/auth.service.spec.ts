@@ -78,8 +78,12 @@ describe('AuthService', () => {
   describe('login', () => {
     it('should return tokens on successful login', async () => {
       mockPrismaService.user.findUnique.mockResolvedValueOnce(mockUser);
-      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
-      mockPrismaService.refreshToken.create.mockResolvedValueOnce(mockRefreshToken);
+      mockJwtService.sign
+        .mockReturnValueOnce('access-token')
+        .mockReturnValueOnce('refresh-token');
+      mockPrismaService.refreshToken.create.mockResolvedValueOnce(
+        mockRefreshToken,
+      );
 
       const result = await service.login({
         email: 'test@example.com',

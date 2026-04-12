@@ -7,11 +7,17 @@ export class IngestEventDto {
   @IsNotEmpty()
   event_id: string;
 
-  @ApiProperty({ description: 'Tenant ID', example: '7a4ae9b7-5a12-4fae-98dc-e226ac78bbee' })
+  @ApiProperty({
+    description: 'Tenant ID',
+    example: '7a4ae9b7-5a12-4fae-98dc-e226ac78bbee',
+  })
   @IsUUID()
   tenant_id: string;
 
-  @ApiProperty({ description: 'Campaign ID', example: '59c39a3d-4f3c-4d45-b525-ad580453c4cf' })
+  @ApiProperty({
+    description: 'Campaign ID',
+    example: '59c39a3d-4f3c-4d45-b525-ad580453c4cf',
+  })
   @IsUUID()
   campaign_id: string;
 

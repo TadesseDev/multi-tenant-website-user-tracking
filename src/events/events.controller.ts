@@ -12,7 +12,8 @@ export class EventsController {
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({
     summary: 'Ingest an event',
-    description: 'Public endpoint for ingesting website events. Events are queued for async processing.',
+    description:
+      'Public endpoint for ingesting website events. Events are queued for async processing.',
   })
   @ApiResponse({
     status: 202,
@@ -23,7 +24,9 @@ export class EventsController {
     status: 400,
     description: 'Invalid event data or invalid tenant/campaign',
   })
-  async ingestEvent(@Body() ingestEventDto: IngestEventDto): Promise<{ jobId: string }> {
+  async ingestEvent(
+    @Body() ingestEventDto: IngestEventDto,
+  ): Promise<{ jobId: string }> {
     return this.eventsService.ingestEvent(ingestEventDto);
   }
 }

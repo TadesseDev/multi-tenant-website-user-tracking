@@ -41,7 +41,9 @@ export class CampaignsService {
     }
 
     if (campaign.tenantId !== tenantId) {
-      throw new TenantAccessException('Access denied: Cannot access this campaign');
+      throw new TenantAccessException(
+        'Access denied: Cannot access this campaign',
+      );
     }
 
     return this.mapToResponse(campaign);
