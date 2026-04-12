@@ -18,8 +18,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const errorResponse = {
       statusCode: status,
       timestamp: new Date().toISOString(),
-      message: (exceptionResponse as any).message || exception.message,
-      error: (exceptionResponse as any).error || HttpStatus[status],
+      message:
+        (exceptionResponse as unknown as { message: string }).message ||
+        exception.message,
+      error:
+        (exceptionResponse as unknown as { error: string }).error ||
+        HttpStatus[status],
     };
 
     response.status(status).json(errorResponse);

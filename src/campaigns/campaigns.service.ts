@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { TenantAccessException } from '../common/exceptions/tenant-access.exception';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { CampaignResponseDto } from './dto/campaign-response.dto';
+import { Campaign } from '@prisma/client';
 
 @Injectable()
 export class CampaignsService {
@@ -23,7 +24,7 @@ export class CampaignsService {
   }
 
   async findAll(tenantId: string): Promise<CampaignResponseDto[]> {
-    const campaigns = await this.prisma.campaign.findMany({
+    const campaigns: Campaign[] = await this.prisma.campaign.findMany({
       where: { tenantId },
       orderBy: { createdAt: 'desc' },
     });
@@ -49,7 +50,7 @@ export class CampaignsService {
     return this.mapToResponse(campaign);
   }
 
-  private mapToResponse(campaign: any): CampaignResponseDto {
+  private mapToResponse(campaign: Campaign): CampaignResponseDto {
     return {
       id: campaign.id,
       name: campaign.name,

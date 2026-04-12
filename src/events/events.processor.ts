@@ -12,7 +12,13 @@ export class EventsProcessor extends WorkerHost {
   }
 
   async process(job: Job): Promise<void> {
-    const { eventId, tenantId, campaignId, eventType, payload } = job.data;
+    const { eventId, tenantId, campaignId, eventType, payload } = job.data as {
+      eventId: string;
+      tenantId: string;
+      campaignId: string;
+      eventType: string;
+      payload: string;
+    };
 
     try {
       // Attempt to create the event - will fail on duplicate due to unique constraint

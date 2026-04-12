@@ -7,14 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
-}
+import { CurrentUserPayload } from '../decorators/current-user.decorator';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -24,7 +17,9 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const request: Request = context.switchToHttp().getRequest();
+    const request: Request & { user: CurrentUserPayload } = context
+      .switchToHttp()
+      .getRequest();
     const authHeader = request.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -36,7 +31,7 @@ export class JwtAuthGuard implements CanActivate {
     const token = authHeader.slice(7);
 
     try {
-      const payload = this.jwtService.verify(token, {
+      const payload: CurrentUserPayload = this.jwtService.verify(token, {
         secret: this.configService.get<string>('jwt.secret'),
       });
 
@@ -46,7 +41,7 @@ export class JwtAuthGuard implements CanActivate {
 
       request.user = payload;
       return true;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
