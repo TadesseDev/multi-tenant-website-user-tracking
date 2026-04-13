@@ -30,6 +30,10 @@ export class CampaignsController {
     description: 'Campaign created successfully',
     type: CampaignResponseDto,
   })
+  @ApiResponse({
+    status: 409,
+    description: 'Campaign name already exists for this tenant',
+  })
   @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   async create(
     @Body() createCampaignDto: CreateCampaignDto,

@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TenantAccessException } from '../common/exceptions/tenant-access.exception';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { CampaignResponseDto } from './dto/campaign-response.dto';
 import { Campaign } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CampaignsService {
@@ -13,14 +14,26 @@ export class CampaignsService {
     tenantId: string,
     createCampaignDto: CreateCampaignDto,
   ): Promise<CampaignResponseDto> {
-    const campaign = await this.prisma.campaign.create({
-      data: {
-        name: createCampaignDto.name,
-        tenantId,
-      },
-    });
+    try {
+      const campaign = await this.prisma.campaign.create({
+        data: {
+          name: createCampaignDto.name,
+          tenantId,
+        },
+      });
 
-    return this.mapToResponse(campaign);
+      return this.mapToResponse(campaign);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException(
+          `Campaign with name "${createCampaignDto.name}" already exists for this tenant`,
+        );
+      }
+      throw error;
+    }
   }
 
   async findAll(tenantId: string): Promise<CampaignResponseDto[]> {

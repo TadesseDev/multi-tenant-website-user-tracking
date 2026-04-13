@@ -54,6 +54,8 @@ model Campaign {
   updatedAt DateTime @updatedAt
   tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   events    Event[]
+
+  @@unique([tenantId, name])
 }
 
 model Event {
