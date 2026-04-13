@@ -204,8 +204,8 @@ REDIS_URL="redis://localhost:6379"
 
 # JWT Authentication
 JWT_SECRET="your-secret-key-change-in-production-min-32-chars"
-JWT_EXPIRY="15m"
-REFRESH_TOKEN_EXPIRY="7d"
+JWT_EXPIRY="900" # 15 minutes in seconds
+REFRESH_TOKEN_EXPIRY="604800" # 7 days in seconds
 
 # Application
 NODE_ENV="development"
@@ -304,10 +304,10 @@ curl -X POST http://localhost:3000/campaigns \
 curl -X POST http://localhost:3000/events/ingest \
   -H "Content-Type: application/json" \
   -d '{
-    "tenantId": "clx123...",
-    "campaignId": "clx456...",
-    "eventId": "evt_001",
-    "eventType": "page_view",
+    "tenant_id": "clx123...",
+    "campaign_id": "clx456...",
+    "event_id": "evt_001",
+    "event_type": "page_view",
     "payload": {
       "page": "/shop",
       "user_id": "user_123"
