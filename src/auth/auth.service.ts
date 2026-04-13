@@ -90,9 +90,14 @@ export class AuthService {
     }
   }
 
-  async logout(refreshToken: string): Promise<void> {
+  async logout(token: string): Promise<void> {
+    const tokenPayload: { sub: string } = await this.jwtService.verify(token, {
+      secret: this.configService.get<string>('jwt.secret'),
+    });
+    const userId = tokenPayload.sub;
+
     await this.prisma.refreshToken.updateMany({
-      where: { token: refreshToken },
+      where: { userId },
       data: { revokedAt: new Date() },
     });
   }
@@ -116,7 +121,15 @@ export class AuthService {
     );
 
     const refreshTokenExpiry = new Date();
-    refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 7); // 7 days
+    const refreshTokenExpirationSeconds = this.configService.get<number>(
+      'jwt.refreshTokenExpiration',
+    );
+    const refreshTokenExpirationInDays = Math.ceil(
+      (refreshTokenExpirationSeconds || 604800) / (60 * 60 * 24),
+    );
+    refreshTokenExpiry.setDate(
+      refreshTokenExpiry.getDate() + refreshTokenExpirationInDays,
+    );
 
     const refreshToken = this.jwtService.sign(
       {

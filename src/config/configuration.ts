@@ -30,10 +30,10 @@ export default (): AppConfig => ({
     secret: process.env.JWT_SECRET || 'default-secret',
     accessTokenExpiration: process.env.JWT_EXPIRATION
       ? parseInt(process.env.JWT_EXPIRATION, 10)
-      : 900000, // 15 minutes in milliseconds
+      : 900, // 15 minutes in seconds
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
     refreshTokenExpiration: process.env.JWT_REFRESH_EXPIRATION
       ? parseInt(process.env.JWT_REFRESH_EXPIRATION, 10)
-      : 604800000, // 7 days in milliseconds
+      : 604800, // 7 days in seconds
   },
 });
