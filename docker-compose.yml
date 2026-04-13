@@ -34,14 +34,13 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3002:3002"
+      - "3000:3000"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/tracking_db
       REDIS_URL: redis://redis:6379
       JWT_SECRET: default-secret
       JWT_REFRESH_SECRET: default-refresh-secret
       NODE_ENV: development
-      PORT: 3002
     depends_on:
       postgres:
         condition: service_healthy
