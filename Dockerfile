@@ -9,6 +9,9 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
+# Compile seed file
+RUN npx tsc prisma/seed.ts --outDir dist/prisma --esModuleInterop --resolveJsonModule
+
 # Runtime stage
 FROM node:20
 
@@ -25,4 +28,17 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 
-CMD ["node", "dist/src/main"]
+# Create entrypoint script to run migrations and seed before starting app
+RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
+    echo 'set -e' >> /app/entrypoint.sh && \
+    echo 'echo "Generating Prisma client..."' >> /app/entrypoint.sh && \
+    echo 'npx prisma generate' >> /app/entrypoint.sh && \
+    echo 'echo "Running database migrations..."' >> /app/entrypoint.sh && \
+    echo 'npx prisma migrate deploy' >> /app/entrypoint.sh && \
+    echo 'echo "Running database seed..."' >> /app/entrypoint.sh && \
+    echo 'node dist/prisma/seed.js' >> /app/entrypoint.sh && \
+    echo 'echo "Starting application..."' >> /app/entrypoint.sh && \
+    echo 'exec node dist/src/main' >> /app/entrypoint.sh && \
+    chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
