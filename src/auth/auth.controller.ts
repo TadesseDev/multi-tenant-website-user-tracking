@@ -11,6 +11,7 @@ import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { RefreshTokenGuard } from '../common/guards/refresh-token.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { authHeader } from 'src/common/decorators/authorization.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -39,8 +40,7 @@ export class AuthController {
     type: AuthResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
-  async refresh(@Req() req: Request): Promise<AuthResponseDto> {
-    const authHeader = req.headers.authorization;
+  async refresh(@authHeader() authHeader: string): Promise<AuthResponseDto> {
     const refreshToken = authHeader?.slice(7) || '';
     return this.authService.refresh(refreshToken);
   }
@@ -50,8 +50,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout and revoke refresh token' })
   @ApiResponse({ status: 200, description: 'Logout successful' })
-  async logout(@Req() req: Request): Promise<{ message: string }> {
-    const authHeader = req.headers.authorization;
+  async logout(@authHeader() authHeader: string): Promise<{ message: string }> {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.slice(7);
       await this.authService.logout(token);

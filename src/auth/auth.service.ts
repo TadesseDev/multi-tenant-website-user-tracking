@@ -34,8 +34,6 @@ export class AuthService {
     return this.generateTokens(user.id, user.tenantId, user.role);
   }
 
-  // TODO: cleanup the linter issues.
-
   async refresh(refreshToken: string): Promise<AuthResponseDto> {
     try {
       const payload: { sub: string; type: string } = this.jwtService.verify(
@@ -51,7 +49,7 @@ export class AuthService {
 
       // Find tokens for this user
       const storedTokens = await this.prisma.refreshToken.findMany({
-        where: { userId: payload.sub },
+        where: { userId: payload.sub, revokedAt: null },
         include: { user: true },
       });
 
@@ -64,7 +62,7 @@ export class AuthService {
         }
       }
 
-      if (!matchedToken || matchedToken.revokedAt) {
+      if (!matchedToken) {
         throw new UnauthorizedException('Token has been revoked');
       }
 
