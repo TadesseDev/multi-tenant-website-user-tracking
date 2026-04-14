@@ -16,7 +16,7 @@ FROM node:20
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci && npm install -g tsx
 
 # Copy Prisma schema and migrations (needed for prisma migrate deploy)
 COPY prisma ./prisma
@@ -33,6 +33,8 @@ RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
     echo 'npx prisma generate' >> /app/entrypoint.sh && \
     echo 'echo "Running database migrations..."' >> /app/entrypoint.sh && \
     echo 'npx prisma migrate deploy' >> /app/entrypoint.sh && \
+    echo 'echo "Running database seed..."' >> /app/entrypoint.sh && \
+    echo 'tsx prisma/seed.ts' >> /app/entrypoint.sh && \
     echo 'echo "Starting application..."' >> /app/entrypoint.sh && \
     echo 'exec node dist/src/main' >> /app/entrypoint.sh && \
     chmod +x /app/entrypoint.sh
