@@ -136,10 +136,12 @@ describe('AuthService', () => {
     it('should revoke refresh token', async () => {
       const refreshToken = 'refresh-token-to-revoke';
 
+      mockJwtService.verify.mockReturnValueOnce({ sub: 'user-123' });
+      mockPrismaService.refreshToken.updateMany.mockResolvedValueOnce({});
       await service.logout(refreshToken);
 
       expect(mockPrismaService.refreshToken.updateMany).toHaveBeenCalledWith({
-        where: { token: refreshToken },
+        where: { userId: 'user-123' },
         data: { revokedAt: expect.any(Date) },
       });
     });

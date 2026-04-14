@@ -48,7 +48,6 @@ services:
         condition: service_healthy
     volumes:
       - /app/node_modules
-    command: node dist/src/main
 
 volumes:
   postgres_data:
