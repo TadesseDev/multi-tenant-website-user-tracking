@@ -18,7 +18,7 @@ import { PrismaModule } from '../prisma/prisma.module';
               name: 'event-ingestion',
               queueUrl: sqsConfig.sqs.queueUrl,
               region: sqsConfig.region,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
               clientOptions: {
                 endpoint: sqsConfig.endpointUrl,
                 region: sqsConfig.region,
@@ -34,7 +34,7 @@ import { PrismaModule } from '../prisma/prisma.module';
               name: 'event-ingestion',
               queueUrl: sqsConfig.sqs.queueUrl,
               region: sqsConfig.region,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
               clientOptions: {
                 endpoint: sqsConfig.endpointUrl,
                 region: sqsConfig.region,

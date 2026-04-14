@@ -33,7 +33,8 @@ export class EventsService {
     }
 
     // Send the event to SQS for processing
-    const queueName = this.configService.get<string>('aws.sqs.queueName') || 'event-ingestion';
+    const queueName =
+      this.configService.get<string>('aws.sqs.queueName') || 'event-ingestion';
     await this.sqsService.send(queueName, {
       id: ingestEventDto.event_id,
       body: {
