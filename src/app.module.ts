@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -26,14 +25,6 @@ import configuration from './config/configuration';
           expiresIn: configService.get<number>('jwt.accessTokenExpiration'),
         },
       }),
-    }),
-    BullModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        connection: {
-          url: configService.get<string>('redis.url'),
-        },
-      }),
-      inject: [ConfigService],
     }),
     PrismaModule,
     AuthModule,

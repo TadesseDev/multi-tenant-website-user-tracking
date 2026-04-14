@@ -27,6 +27,7 @@ export class EventsController {
   async ingestEvent(
     @Body() ingestEventDto: IngestEventDto,
   ): Promise<{ jobId: string }> {
-    return this.eventsService.ingestEvent(ingestEventDto);
+    const result = await this.eventsService.ingestEvent(ingestEventDto);
+    return { jobId: result.messageId };
   }
 }

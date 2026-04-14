@@ -4,8 +4,15 @@ export interface AppConfig {
   database: {
     url: string;
   };
-  redis: {
-    url: string;
+  aws: {
+    region: string;
+    endpointUrl: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+    sqs: {
+      queueUrl: string;
+      queueName: string;
+    };
   };
   jwt: {
     secret: string;
@@ -23,8 +30,17 @@ export default (): AppConfig => ({
       process.env.DATABASE_URL ||
       'postgresql://postgres:postgres@localhost:5432/tracking_db',
   },
-  redis: {
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
+  aws: {
+    region: process.env.AWS_REGION || 'us-east-1',
+    endpointUrl: process.env.AWS_ENDPOINT_URL || 'http://localhost:4566',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'test',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'test',
+    sqs: {
+      queueUrl:
+        process.env.SQS_QUEUE_URL ||
+        'http://localhost:4566/000000000000/event-ingestion',
+      queueName: process.env.SQS_QUEUE_NAME || 'event-ingestion',
+    },
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'default-secret',

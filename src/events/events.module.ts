@@ -1,18 +1,56 @@
 import { Module } from '@nestjs/common';
-import { BullModule } from '@nestjs/bullmq';
+import { ConfigService } from '@nestjs/config';
+import { SqsModule } from '@ssut/nestjs-sqs';
 import { EventsService } from './events.service';
 import { EventsController } from './events.controller';
-import { EventsProcessor } from './events.processor';
+import { EventsConsumer } from './events.consumer';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
     PrismaModule,
-    BullModule.registerQueue({
-      name: 'event-ingestion',
+    SqsModule.registerAsync({
+      useFactory: (configService: ConfigService) => {
+        const sqsConfig = configService.get('aws');
+        return {
+          consumers: [
+            {
+              name: 'event-ingestion',
+              queueUrl: sqsConfig.sqs.queueUrl,
+              region: sqsConfig.region,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              clientOptions: {
+                endpoint: sqsConfig.endpointUrl,
+                region: sqsConfig.region,
+                credentials: {
+                  accessKeyId: sqsConfig.accessKeyId,
+                  secretAccessKey: sqsConfig.secretAccessKey,
+                },
+              } as any,
+            },
+          ],
+          producers: [
+            {
+              name: 'event-ingestion',
+              queueUrl: sqsConfig.sqs.queueUrl,
+              region: sqsConfig.region,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              clientOptions: {
+                endpoint: sqsConfig.endpointUrl,
+                region: sqsConfig.region,
+                credentials: {
+                  accessKeyId: sqsConfig.accessKeyId,
+                  secretAccessKey: sqsConfig.secretAccessKey,
+                },
+              } as any,
+            },
+          ],
+        };
+      },
+      inject: [ConfigService],
     }),
   ],
-  providers: [EventsService, EventsProcessor],
+  providers: [EventsService, EventsConsumer],
   controllers: [EventsController],
 })
 export class EventsModule {}

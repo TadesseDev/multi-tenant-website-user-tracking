@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { ConfigService } from '@nestjs/config';
+import { SqsService } from '@ssut/nestjs-sqs';
 import { PrismaService } from '../prisma/prisma.service';
 import { IngestEventDto } from './dto/ingest-event.dto';
 
@@ -8,12 +8,13 @@ import { IngestEventDto } from './dto/ingest-event.dto';
 export class EventsService {
   constructor(
     private prisma: PrismaService,
-    @InjectQueue('event-ingestion') private eventQueue: Queue,
+    private sqsService: SqsService,
+    private configService: ConfigService,
   ) {}
 
   async ingestEvent(
     ingestEventDto: IngestEventDto,
-  ): Promise<{ jobId: string }> {
+  ): Promise<{ messageId: string }> {
     // Validate tenant and campaign exist
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: ingestEventDto.tenant_id },
@@ -31,15 +32,19 @@ export class EventsService {
       throw new BadRequestException('Invalid campaign_id for this tenant');
     }
 
-    // Queue the event for processing
-    const job = await this.eventQueue.add('process-event', {
-      eventId: ingestEventDto.event_id,
-      tenantId: ingestEventDto.tenant_id,
-      campaignId: ingestEventDto.campaign_id,
-      eventType: ingestEventDto.event_type,
-      payload: ingestEventDto.payload,
+    // Send the event to SQS for processing
+    const queueName = this.configService.get<string>('aws.sqs.queueName') || 'event-ingestion';
+    await this.sqsService.send(queueName, {
+      id: ingestEventDto.event_id,
+      body: {
+        eventId: ingestEventDto.event_id,
+        tenantId: ingestEventDto.tenant_id,
+        campaignId: ingestEventDto.campaign_id,
+        eventType: ingestEventDto.event_type,
+        payload: ingestEventDto.payload,
+      },
     });
 
-    return { jobId: job.id || '' };
+    return { messageId: ingestEventDto.event_id };
   }
 }
