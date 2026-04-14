@@ -107,7 +107,7 @@ npm run start:dev
 
 ```bash
 # Clone or navigate to project
-cd Tadesse-MAG-takehome
+cd multi-tenant-website-user-tracking
 
 # Start everything
 docker compose up --build
