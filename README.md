@@ -376,6 +376,24 @@ curl -X GET "http://localhost:3000/analytics/campaigns/clx456.../daily?startDate
 - Duplicate inserts fail with P2002 (unique constraint violation) → logged & silently skipped
 - Successful processing → message deleted from queue automatically
 
+### Aggregation Strategy
+
+**Requirement:** Daily aggregation per campaign - count of events per campaign per day.
+
+**Strategy: On-Demand SQL Queries**
+
+We compute aggregates via SQL queries rather than:
+
+- **On-write computation**: Would add latency to critical event ingestion path
+- **Materialized tables**: Would require background jobs and cache invalidation
+
+**Benefits:**
+
+- **Simple**: No additional infrastructure or background processes
+- **Accurate**: Queries the source of truth (events table) in real-time
+- **Flexible**: Supports arbitrary date ranges without pre-computation
+- **Scalable**: Efficient SQL grouping without duplicating data
+
 ---
 
 ## 🛠️ Tech Stack
